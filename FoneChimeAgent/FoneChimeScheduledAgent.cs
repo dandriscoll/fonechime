@@ -1,15 +1,19 @@
 ﻿using System.Diagnostics;
 using System.Windows;
 using Microsoft.Phone.Scheduler;
+using Microsoft.Phone.Shell;
 
 namespace FoneChimeAgent
 {
-    public class ScheduledAgent : ScheduledTaskAgent
+    public class FoneChimeScheduledAgent : ScheduledTaskAgent
     {
+        public const string ScheduledAgentName = "FoneChimeAgent";
+        public const string ScheduledAgentDescription = "FoneChime background task";
+
         /// <remarks>
         /// ScheduledAgent constructor, initializes the UnhandledException handler
         /// </remarks>
-        static ScheduledAgent()
+        static FoneChimeScheduledAgent()
         {
             // Subscribe to the managed exception handler
             Deployment.Current.Dispatcher.BeginInvoke(delegate
@@ -39,7 +43,15 @@ namespace FoneChimeAgent
         /// </remarks>
         protected override void OnInvoke(ScheduledTask task)
         {
-            //TODO: Add code to perform your task in background
+            FoneChime chime = new FoneChime();
+
+            if (chime.Advance())
+            {
+                ShellToast toast = new ShellToast();
+                toast.Title = "FoneChime";
+                toast.Content = "Chime!";
+                toast.Show();
+            }
 
             NotifyComplete();
         }
